@@ -81,8 +81,8 @@ public interface GuildMessageSearchSpecGenerator extends Spec<Multimap<String, O
 
         if (limit().isPresent()) args.put("limit", Collections.singletonList(limit().get()));
         if (offset().isPresent()) args.put("offset", Collections.singletonList(offset().get()));
-        if (before().isPresent()) args.put("max_id", Collections.singletonList(before().get()));
-        if (after().isPresent()) args.put("min_id", Collections.singletonList(after().get()));
+        if (before().isPresent()) args.put("max_id", Collections.singletonList(before().get().asString()));
+        if (after().isPresent()) args.put("min_id", Collections.singletonList(after().get().asString()));
         if (slop().isPresent()) args.put("slop", Collections.singletonList(slop().get()));
         if (content().isPresent()) args.put("content", Collections.singletonList(content().get()));
         if (mentionEveryone().isPresent()) args.put("mention_everyone", Collections.singletonList(mentionEveryone().get()));
