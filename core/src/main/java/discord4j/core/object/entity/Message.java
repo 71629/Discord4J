@@ -44,7 +44,6 @@ import discord4j.core.spec.StartThreadFromMessageMono;
 import discord4j.core.spec.StartThreadFromMessageSpec;
 import discord4j.core.spec.legacy.LegacyMessageEditSpec;
 import discord4j.core.util.EntityUtil;
-import discord4j.discordjson.json.ImmutableMessageReferenceData;
 import discord4j.discordjson.json.MessageData;
 import discord4j.discordjson.json.MessageReferenceData;
 import discord4j.discordjson.json.PollData;
@@ -827,7 +826,7 @@ public final class Message implements Entity {
      * error is received, it is emitted through the {@code MessageReplyMono}.
      */
     public MessageReplyMono reply() {
-        return MessageReplyMono.of(this).withMessageReference(ImmutableMessageReferenceData.copyOf(asMessageReferenceData(MessageReference.Type.DEFAULT.getValue())));
+        return MessageReplyMono.of(this).withMessageReference(asMessageReferenceData(MessageReference.Type.DEFAULT.getValue()));
     }
 
     /**
@@ -839,7 +838,7 @@ public final class Message implements Entity {
      */
     public Mono<Message> forward(MessageChannel messageChannel) {
         Objects.requireNonNull(messageChannel);
-        return messageChannel.createMessage(MessageCreateSpec.create().withMessageReference(ImmutableMessageReferenceData.copyOf(asMessageReferenceData(MessageReference.Type.FORWARD.getValue()))));
+        return messageChannel.createMessage(MessageCreateSpec.create().withMessageReference(asMessageReferenceData(MessageReference.Type.FORWARD.getValue())));
     }
 
     /**
