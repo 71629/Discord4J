@@ -36,18 +36,10 @@ import discord4j.core.object.entity.poll.Poll;
 import discord4j.core.object.reaction.Reaction;
 import discord4j.core.object.emoji.Emoji;
 import discord4j.core.retriever.EntityRetrievalStrategy;
-import discord4j.core.spec.MessageCreateSpec;
-import discord4j.core.spec.MessageEditMono;
-import discord4j.core.spec.MessageEditSpec;
-import discord4j.core.spec.StartThreadFromMessageMono;
-import discord4j.core.spec.StartThreadFromMessageSpec;
+import discord4j.core.spec.*;
 import discord4j.core.spec.legacy.LegacyMessageEditSpec;
 import discord4j.core.util.EntityUtil;
-import discord4j.discordjson.json.MessageData;
-import discord4j.discordjson.json.MessageReferenceData;
-import discord4j.discordjson.json.PollData;
-import discord4j.discordjson.json.StartThreadFromMessageRequest;
-import discord4j.discordjson.json.UserData;
+import discord4j.discordjson.json.*;
 import discord4j.discordjson.possible.Possible;
 import discord4j.gateway.intent.Intent;
 import discord4j.rest.entity.RestChannel;
@@ -516,6 +508,14 @@ public final class Message implements Entity {
                 .map(data -> new MessageReference(gateway, data));
     }
 
+    public MessageReferenceData asMessageReferenceData() {
+        return MessageReferenceData.builder()
+                .messageId(this.data.id())
+                .channelId(this.data.channelId())
+                .guildId(this.data.guildId())
+                .build();
+    }
+
     /**
      * Returns a list of {@link MessageSnapshot} sent with the forward message.
      *
@@ -800,6 +800,10 @@ public final class Message implements Entity {
         return MessageEditMono.of(this);
     }
 
+    public MessageReplyMono reply() {
+        return MessageReplyMono.of(this).withMessageReference(ImmutableMessageReferenceData.copyOf(asMessageReferenceData()).withType(MessageReference.Type.DEFAULT.getValue()));
+    }
+
     /**
      * Request to forward this message.
      *
@@ -809,7 +813,7 @@ public final class Message implements Entity {
      */
     public Mono<Message> forward(MessageChannel messageChannel) {
         Objects.requireNonNull(messageChannel);
-        return messageChannel.createMessage(MessageCreateSpec.create().withMessageReference(MessageReferenceData.builder().type(MessageReference.Type.FORWARD.getValue()).messageId(this.data.id()).channelId(this.data.channelId()).guildId(this.data.guildId()).build()));
+        return messageChannel.createMessage(MessageCreateSpec.create().withMessageReference(ImmutableMessageReferenceData.copyOf(asMessageReferenceData()).withType(MessageReference.Type.FORWARD.getValue())));
     }
 
     /**
