@@ -531,7 +531,6 @@ public final class Message implements Entity {
                 .type(type.getValue())
                 .messageId(this.data.id())
                 .channelId(this.data.channelId())
-                .guildId(this.data.guildId())
                 .build();
     }
 
