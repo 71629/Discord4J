@@ -521,21 +521,15 @@ public final class Message implements Entity {
     /**
      * Returns the {@link MessageReferenceData} referencing this message, which can be used to create a crosspost or reply.
      * <p>
-     * The {@link MessageReferenceData} returned from this method does not have its `type` set.
-     * Set the value of `type` to either {@code MessageReference.Type.DAFAULT} for reply or {@code MessageReference.Type.FORWARD} for forward.
-     *
-     * <pre>{@code
-     *  ImmutableMessageReferenceData
-     *      .copyOf(message.asMessageReferenceData())
-     *      .withType(type);
-     * }</pre>
-     *
      * Or use {@link #reply()} or {@link #forward(MessageChannel)}/{@link #forward(Snowflake)} shorthand.
      *
+     * @param type The type of message reference.
      * @return The {@link MessageReferenceData} referencing this message.
+     * @see {@link MessageReference.Type}
      */
-    public MessageReferenceData asMessageReferenceData() {
+    public MessageReferenceData asMessageReferenceData(int type) {
         return MessageReferenceData.builder()
+                .type(type)
                 .messageId(this.data.id())
                 .channelId(this.data.channelId())
                 .guildId(this.data.guildId())
@@ -833,7 +827,7 @@ public final class Message implements Entity {
      * error is received, it is emitted through the {@code MessageReplyMono}.
      */
     public MessageReplyMono reply() {
-        return MessageReplyMono.of(this).withMessageReference(ImmutableMessageReferenceData.copyOf(asMessageReferenceData()).withType(MessageReference.Type.DEFAULT.getValue()));
+        return MessageReplyMono.of(this).withMessageReference(ImmutableMessageReferenceData.copyOf(asMessageReferenceData(MessageReference.Type.DEFAULT.getValue())));
     }
 
     /**
@@ -845,7 +839,7 @@ public final class Message implements Entity {
      */
     public Mono<Message> forward(MessageChannel messageChannel) {
         Objects.requireNonNull(messageChannel);
-        return messageChannel.createMessage(MessageCreateSpec.create().withMessageReference(ImmutableMessageReferenceData.copyOf(asMessageReferenceData()).withType(MessageReference.Type.FORWARD.getValue())));
+        return messageChannel.createMessage(MessageCreateSpec.create().withMessageReference(ImmutableMessageReferenceData.copyOf(asMessageReferenceData(MessageReference.Type.FORWARD.getValue()))));
     }
 
     /**
