@@ -123,3 +123,18 @@ abstract class MessageCreateMonoGenerator extends Mono<Message> implements Messa
     @Override
     public abstract String toString();
 }
+
+@SuppressWarnings("immutables:subtype")
+@Value.Immutable(builder = false)
+abstract class MessageReplyMonoGenerator extends Mono<Message> implements MessageCreateSpecGenerator {
+
+    abstract Message message();
+
+    @Override
+    public void subscribe(CoreSubscriber<? super Message> actual) {
+        message().getChannel().flatMap(messageChannel -> messageChannel.createMessage(MessageCreateSpec.copyOf(this))).subscribe(actual);
+    }
+
+    @Override
+    public abstract String toString();
+}
