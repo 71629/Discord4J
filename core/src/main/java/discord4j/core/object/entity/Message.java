@@ -526,9 +526,9 @@ public final class Message implements Entity {
      * @return The {@link MessageReferenceData} referencing this message.
      * @see {@link MessageReference.Type}
      */
-    public MessageReferenceData asMessageReferenceData(int type) {
+    public MessageReferenceData asMessageReferenceData(MessageReference.Type type) {
         return MessageReferenceData.builder()
-                .type(type)
+                .type(type.getValue())
                 .messageId(this.data.id())
                 .channelId(this.data.channelId())
                 .guildId(this.data.guildId())
@@ -826,7 +826,7 @@ public final class Message implements Entity {
      * error is received, it is emitted through the {@code MessageReplyMono}.
      */
     public MessageReplyMono reply() {
-        return MessageReplyMono.of(this).withMessageReference(asMessageReferenceData(MessageReference.Type.DEFAULT.getValue()));
+        return MessageReplyMono.of(this).withMessageReference(asMessageReferenceData(MessageReference.Type.DEFAULT));
     }
 
     /**
@@ -838,7 +838,7 @@ public final class Message implements Entity {
      */
     public Mono<Message> forward(MessageChannel messageChannel) {
         Objects.requireNonNull(messageChannel);
-        return messageChannel.createMessage(MessageCreateSpec.create().withMessageReference(asMessageReferenceData(MessageReference.Type.FORWARD.getValue())));
+        return messageChannel.createMessage(MessageCreateSpec.create().withMessageReference(asMessageReferenceData(MessageReference.Type.FORWARD)));
     }
 
     /**
