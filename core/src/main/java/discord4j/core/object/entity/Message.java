@@ -508,6 +508,22 @@ public final class Message implements Entity {
                 .map(data -> new MessageReference(gateway, data));
     }
 
+    /**
+     * Returns the {@link MessageReferenceData} referencing this message, which can be used to create a crosspost or reply.
+     * <p>
+     * The {@link MessageReferenceData} returned from this method does not have its `type` set.
+     * Set the value of `type` to either {@code MessageReference.Type.DAFAULT} for reply or {@code MessageReference.Type.FORWARD} for forward.
+     *
+     * <pre>{@code
+     *  ImmutableMessageReferenceData
+     *      .copyOf(message.asMessageReferenceData())
+     *      .withType(type);
+     * }</pre>
+     *
+     * Or use {@link #reply()} or {@link #forward(MessageChannel)}/{@link #forward(Snowflake)} shorthand.
+     *
+     * @return The {@link MessageReferenceData} referencing this message.
+     */
     public MessageReferenceData asMessageReferenceData() {
         return MessageReferenceData.builder()
                 .messageId(this.data.id())
@@ -800,6 +816,12 @@ public final class Message implements Entity {
         return MessageEditMono.of(this);
     }
 
+    /**
+     * Request to reply to this message. Properties specifying how the message is created can be set via the `withXXX` methods of the returned {@link MessageReplyMono}.
+     *
+     * @return A {@link MessageReplyMono} where, upon successful completion, emits the created {@link Message}. If an
+     * error is received, it is emitted through the {@code MessageReplyMono}.
+     */
     public MessageReplyMono reply() {
         return MessageReplyMono.of(this).withMessageReference(ImmutableMessageReferenceData.copyOf(asMessageReferenceData()).withType(MessageReference.Type.DEFAULT.getValue()));
     }
