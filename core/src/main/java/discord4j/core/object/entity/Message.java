@@ -39,6 +39,7 @@ import discord4j.core.retriever.EntityRetrievalStrategy;
 import discord4j.core.spec.MessageCreateSpec;
 import discord4j.core.spec.MessageEditMono;
 import discord4j.core.spec.MessageEditSpec;
+import discord4j.core.spec.MessageReplyMono;
 import discord4j.core.spec.StartThreadFromMessageMono;
 import discord4j.core.spec.StartThreadFromMessageSpec;
 import discord4j.core.spec.legacy.LegacyMessageEditSpec;
@@ -517,6 +518,23 @@ public final class Message implements Entity {
     }
 
     /**
+     * Returns the {@link MessageReferenceData} referencing this message, which can be used to create a crosspost or reply.
+     * <p>
+     * Or use {@link #reply()} or {@link #forward(MessageChannel)}/{@link #forward(Snowflake)} shorthand.
+     *
+     * @param type The type of message reference.
+     * @return The {@link MessageReferenceData} referencing this message.
+     * @see MessageReference.Type
+     */
+    public MessageReferenceData asMessageReferenceData(MessageReference.Type type) {
+        return MessageReferenceData.builder()
+                .type(type.getValue())
+                .messageId(this.data.id())
+                .channelId(this.data.channelId())
+                .build();
+    }
+
+    /**
      * Returns a list of {@link MessageSnapshot} sent with the forward message.
      *
      * @return A list of {@link MessageSnapshot} sent with the forward message.
@@ -801,15 +819,25 @@ public final class Message implements Entity {
     }
 
     /**
+     * Request to reply to this message. Properties specifying how the message is created can be set via the `withXXX` methods of the returned {@link MessageReplyMono}.
+     *
+     * @return A {@link MessageReplyMono} where, upon successful completion, emits the created {@link Message}. If an
+     * error is received, it is emitted through the {@code MessageReplyMono}.
+     */
+    public MessageReplyMono reply() {
+        return MessageReplyMono.of(this).withMessageReference(this.asMessageReferenceData(MessageReference.Type.DEFAULT));
+    }
+
+    /**
      * Request to forward this message.
      *
      * @param messageChannel The message channel where the forward is going to be sent.
      * @return A {@link Mono} where, upon successful completion, emits the created {@link Message}. If an error is
      * received, it is emitted through the {@code Mono}.
      */
-    public Mono<Message> forward(MessageChannel messageChannel) {
+    public Mono<Message> forward(final MessageChannel messageChannel) {
         Objects.requireNonNull(messageChannel);
-        return messageChannel.createMessage(MessageCreateSpec.create().withMessageReference(MessageReferenceData.builder().type(MessageReference.Type.FORWARD.getValue()).messageId(this.data.id()).channelId(this.data.channelId()).guildId(this.data.guildId()).build()));
+        return messageChannel.createMessage(MessageCreateSpec.create().withMessageReference(this.asMessageReferenceData(MessageReference.Type.FORWARD)));
     }
 
     /**
@@ -819,7 +847,7 @@ public final class Message implements Entity {
      * @return A {@link Mono} where, upon successful completion, emits the created {@link Message}. If an error is
      * received, it is emitted through the {@code Mono}.
      */
-    public Mono<Message> forward(Snowflake channelId) {
+    public Mono<Message> forward(final Snowflake channelId) {
         Objects.requireNonNull(channelId);
         return this.getClient().getChannelById(channelId).cast(MessageChannel.class).flatMap(this::forward);
     }
