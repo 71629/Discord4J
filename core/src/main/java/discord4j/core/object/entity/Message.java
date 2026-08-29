@@ -825,7 +825,7 @@ public final class Message implements Entity {
      * error is received, it is emitted through the {@code MessageReplyMono}.
      */
     public MessageReplyMono reply() {
-        return MessageReplyMono.of(this).withMessageReference(asMessageReferenceData(MessageReference.Type.DEFAULT));
+        return MessageReplyMono.of(this).withMessageReference(this.asMessageReferenceData(MessageReference.Type.DEFAULT));
     }
 
     /**
@@ -835,9 +835,9 @@ public final class Message implements Entity {
      * @return A {@link Mono} where, upon successful completion, emits the created {@link Message}. If an error is
      * received, it is emitted through the {@code Mono}.
      */
-    public Mono<Message> forward(MessageChannel messageChannel) {
+    public Mono<Message> forward(final MessageChannel messageChannel) {
         Objects.requireNonNull(messageChannel);
-        return messageChannel.createMessage(MessageCreateSpec.create().withMessageReference(asMessageReferenceData(MessageReference.Type.FORWARD)));
+        return messageChannel.createMessage(MessageCreateSpec.create().withMessageReference(this.asMessageReferenceData(MessageReference.Type.FORWARD)));
     }
 
     /**
@@ -847,7 +847,7 @@ public final class Message implements Entity {
      * @return A {@link Mono} where, upon successful completion, emits the created {@link Message}. If an error is
      * received, it is emitted through the {@code Mono}.
      */
-    public Mono<Message> forward(Snowflake channelId) {
+    public Mono<Message> forward(final Snowflake channelId) {
         Objects.requireNonNull(channelId);
         return this.getClient().getChannelById(channelId).cast(MessageChannel.class).flatMap(this::forward);
     }
