@@ -524,7 +524,7 @@ public final class Message implements Entity {
      *
      * @param type The type of message reference.
      * @return The {@link MessageReferenceData} referencing this message.
-     * @see {@link MessageReference.Type}
+     * @see MessageReference.Type
      */
     public MessageReferenceData asMessageReferenceData(MessageReference.Type type) {
         return MessageReferenceData.builder()
